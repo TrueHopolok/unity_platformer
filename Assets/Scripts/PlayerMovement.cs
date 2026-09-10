@@ -7,27 +7,24 @@ public class PlayerMovement : MonoBehaviour
     InputAction jumpAction;
     InputAction moveAction;
     Rigidbody2D body;
-    BoxCollider2D hitbox;
     bool isGrounded;
     bool jumpJustPressed;
     bool jumpJustReleased;
-    [SerializeField] float jumpForce = 8f;
-    [SerializeField] float gravityForce = 5f;
-
-    [Header("Ground Check")]
-    [SerializeField] Transform groundCheck;
-    [SerializeField] Vector2 groundCheckSize = new Vector2(0.8f, 0.1f);
-    [SerializeField] LayerMask groundLayer;
+    [SerializeField] float jumpForce = 15f;
+    [SerializeField] float gravityForce = 25f;
+    [SerializeField] float horizontalVelocity = 10f;
 
     void Awake()
     {
         controls = new InputControls();
-        controls.Enable();
+        // can be skipped, since OnEnable() is also called right after Awake()
+        // but calling it twice won't do any harm
+        // controls.Enable();
         jumpAction = controls.Player.Jump;
         moveAction = controls.Player.Move;
-
         body = GetComponent<Rigidbody2D>();
-        hitbox = GetComponent<BoxCollider2D>();
+        // disable natural gravity, since we will control it manually
+        body.gravityScale = 0f;
     }
 
     void Update()
@@ -38,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        Debug.Log(body.linearVelocityY);
         HandleJumpCollissions();
         HandleVerticalMovement();
         HandleHorizontalMovement();
@@ -46,8 +44,7 @@ public class PlayerMovement : MonoBehaviour
     // Can be extended to be used for wall jumping
     void HandleJumpCollissions()
     {
-        isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0f, groundLayer);
-        // isGrounded = false; // todo
+        isGrounded = false; // todo
     }
 
     void HandleVerticalMovement()
@@ -56,10 +53,11 @@ public class PlayerMovement : MonoBehaviour
         {
             body.linearVelocityY = jumpForce;
         }
+
         if (isGrounded)
         {
             body.linearVelocityY = 0f;
-            // move jump logic here
+            // todo: move jump logic here
         }
         else
         {
@@ -68,14 +66,20 @@ public class PlayerMovement : MonoBehaviour
                 body.linearVelocityY *= 0.5f;
             }
             body.linearVelocityY -= gravityForce * Time.fixedDeltaTime;
+            if (body.linearVelocityY < 0f)
+            {
+                body.linearVelocityY -= gravityForce * Time.fixedDeltaTime;
+            }
         }
+
         jumpJustPressed = false;
         jumpJustReleased = false;
     }
 
     void HandleHorizontalMovement()
     {
-        // todo
+        float direction = moveAction.ReadValue<Vector2>().x;
+        body.linearVelocityX = direction * horizontalVelocity;
     }
 
     void OnEnable()

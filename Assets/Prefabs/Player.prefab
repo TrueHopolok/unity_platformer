@@ -106,13 +106,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22b841aa9ab98a0438d94af1d8bfba36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  jumpForce: 1
-  gravityForce: 5
-  groundCheck: {fileID: 8918071079229231352}
-  groundCheckSize: {x: 0.8, y: 0.1}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  jumpForce: 15
+  gravityForce: 25
+  horizontalVelocity: 10
 --- !u!50 &5853270000493269919
 Rigidbody2D:
   serializedVersion: 5
@@ -121,7 +117,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4394980378501440269}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
