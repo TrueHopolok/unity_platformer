@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -36,28 +37,40 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         Debug.Log(body.linearVelocityY);
-        HandleJumpCollissions();
+        UpdateJumpStates_ColliderVariant();
+        // UpdateJumpStates_RaycastVariant();
         HandleVerticalMovement();
         HandleHorizontalMovement();
     }
 
     // Can be extended to be used for wall jumping
-    void HandleJumpCollissions()
+    void UpdateJumpStates_ColliderVariant()
     {
-        isGrounded = false; // todo
+        isGrounded = false;
+        if (Mathf.Approximately(body.linearVelocityY, 0f))
+        {
+            // Use overlapping to check for collisions
+        }
+        else
+        {
+            // return false
+        }
+    }
+
+    void UpdateJumpStates_RaycastVariant()
+    {
+        // todo
     }
 
     void HandleVerticalMovement()
     {
-        if (jumpJustPressed)
-        {
-            body.linearVelocityY = jumpForce;
-        }
-
         if (isGrounded)
         {
             body.linearVelocityY = 0f;
-            // todo: move jump logic here
+            if (jumpJustPressed)
+            {
+                body.linearVelocityY = jumpForce;
+            }
         }
         else
         {
