@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     InputAction jumpAction;
     InputAction moveAction;
     Rigidbody2D body;
+    BoxCollider2D hitbox;
     bool isGrounded;
     bool jumpJustPressed;
     bool jumpJustReleased;
@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         // disable natural gravity, since we will control it manually
         body.gravityScale = 0f;
+        hitbox = GetComponent<BoxCollider2D>();
     }
 
     void Update()
@@ -36,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Debug.Log(body.linearVelocityY);
         UpdateJumpStates_ColliderVariant();
         // UpdateJumpStates_RaycastVariant();
         HandleVerticalMovement();
@@ -46,15 +46,16 @@ public class PlayerMovement : MonoBehaviour
     // Can be extended to be used for wall jumping
     void UpdateJumpStates_ColliderVariant()
     {
-        isGrounded = false;
-        if (Mathf.Approximately(body.linearVelocityY, 0f))
-        {
-            // Use overlapping to check for collisions
-        }
-        else
-        {
-            // return false
-        }
+        const float checkSize = 0.02f;
+
+        Vector2 hitboxPosition = transform.position;
+        hitboxPosition += hitbox.offset;
+        Vector2 hitboxSize = hitbox.size;
+
+        // 0.01f needed to avoid border collission with player hitbox
+        hitboxPosition.y -= hitboxSize.y * (0.5f + checkSize / 2) + 0.01f;
+        hitboxSize.y = hitboxSize.y * checkSize;
+        isGrounded = Mathf.Approximately(body.linearVelocityY, 0f) && Physics2D.OverlapBox(hitboxPosition, hitboxSize, 0f) != null;
     }
 
     void UpdateJumpStates_RaycastVariant()
