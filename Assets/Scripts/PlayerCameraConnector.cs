@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerCameraConector : MonoBehaviour
+public class PlayerCameraConnector : MonoBehaviour
 {
     void Start()
     {
