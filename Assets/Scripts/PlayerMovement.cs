@@ -41,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Can be extended to be used for wall jumping
         if (useRaycastVariant)
         {
             UpdateJumpStates_RaycastVariant();
@@ -53,7 +54,6 @@ public class PlayerMovement : MonoBehaviour
         HandleHorizontalMovement();
     }
 
-    // Can be extended to be used for wall jumping
     void UpdateJumpStates_ColliderVariant()
     {
         if (!Mathf.Approximately(body.linearVelocityY, 0f))
