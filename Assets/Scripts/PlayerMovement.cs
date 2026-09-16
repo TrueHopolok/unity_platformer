@@ -1,12 +1,10 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-
     [SerializeField] float checkSize = 0.02f;
-    [SerializeField] float raycastAmount = 5;
+    [SerializeField] int raycastAmount = 5;
     [SerializeField] bool useRaycastVariant = true;
     [SerializeField] bool drawDebugRays = true;
     InputControls controls;
@@ -79,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
             hitboxPosition.x -= hitboxSize.x / 2;
             Debug.DrawRay(hitboxPosition, Vector2.down, Color.red);
             hitboxPosition.x += hitboxSize.x;
-            Debug.DrawRay(hitboxPosition, Vector2.down, Color.red, 1f);
+            Debug.DrawRay(hitboxPosition, Vector2.down, Color.red);
         }
     }
 
@@ -105,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = Physics2D.Raycast(hitboxPosition, Vector2.down, checkSize);
             if (drawDebugRays)
             {
-                Debug.DrawRay(hitboxPosition, Vector2.down, Color.red, 1f);
+                Debug.DrawRay(hitboxPosition, Vector2.down, Color.red);
             }
             if (isGrounded) break;
             hitboxPosition.x += delta;
@@ -129,6 +127,8 @@ public class PlayerMovement : MonoBehaviour
                 body.linearVelocityY *= 0.5f;
             }
             body.linearVelocityY -= gravityForce * Time.fixedDeltaTime;
+
+            // apply extra gravity when falling for better game feel
             if (body.linearVelocityY < 0f)
             {
                 body.linearVelocityY -= gravityForce * Time.fixedDeltaTime;

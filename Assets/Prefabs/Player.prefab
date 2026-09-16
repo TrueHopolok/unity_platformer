@@ -106,6 +106,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22b841aa9ab98a0438d94af1d8bfba36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  checkSize: 0.02
+  raycastAmount: 5
+  useRaycastVariant: 1
+  drawDebugRays: 1
   jumpForce: 15
   gravityForce: 25
   horizontalVelocity: 10
