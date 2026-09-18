@@ -112,6 +112,7 @@ MonoBehaviour:
   raycastAmount: 5
   useRaycastVariant: 1
   drawDebugRays: 1
+  jumpBuffer: 0.1
   jumpForce: 15
   gravityForce: 25
   horizontalVelocity: 10

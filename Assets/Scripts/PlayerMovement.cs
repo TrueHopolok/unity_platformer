@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +14,8 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D body;
     BoxCollider2D hitbox;
     bool isGrounded;
-    bool jumpJustPressed;
+    float jumpWasPressed = 0.0f;
+    [SerializeField] float jumpBuffer = 0.1f;
     bool jumpJustReleased;
     [SerializeField] float jumpForce = 15f;
     [SerializeField] float gravityForce = 25f;
@@ -35,7 +37,14 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        jumpJustPressed = jumpJustPressed || jumpAction.WasPressedThisFrame();
+        if (jumpAction.WasPressedThisFrame())
+        {
+            jumpWasPressed = jumpBuffer;
+        }
+        else
+        {
+            jumpWasPressed = Mathf.Clamp(jumpWasPressed - Time.deltaTime, 0.0f, jumpBuffer);
+        }
         jumpJustReleased = jumpJustReleased || jumpAction.WasReleasedThisFrame();
     }
 
@@ -115,9 +124,9 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             body.linearVelocityY = 0f;
-            if (jumpJustPressed)
+            if (jumpWasPressed > 0.0f)
             {
-                body.linearVelocityY = jumpForce;
+                body.linearVelocityY = jumpAction.ReadValue<float>() > 0.0f ? jumpForce : jumpForce * 0.5f;
             }
         }
         else
@@ -135,7 +144,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        jumpJustPressed = false;
         jumpJustReleased = false;
     }
 
