@@ -110,9 +110,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   checkSize: 0.02
   raycastAmount: 5
-  useRaycastVariant: 1
+  useRaycastVariant: 0
   drawDebugRays: 1
   jumpBuffer: 0.1
+  coyoteLength: 0.2
   jumpForce: 15
   gravityForce: 25
   horizontalVelocity: 10

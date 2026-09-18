@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpBuffer = 0.1f;
     float coyoteTime = 0.0f;
     [SerializeField] float coyoteLength = 0.2f;
+    bool isNearWall;
     bool jumpJustReleased;
     [SerializeField] float jumpForce = 15f;
     [SerializeField] float gravityForce = 25f;
@@ -55,17 +55,19 @@ public class PlayerMovement : MonoBehaviour
         // Can be extended to be used for wall jumping
         if (useRaycastVariant)
         {
-            UpdateJumpStates_RaycastVariant();
+            UpdateGroundJumpState_RaycastVariant();
+            UpdateWallJumpState_RaycastVariant();
         }
         else
         {
-            UpdateJumpStates_ColliderVariant();
+            UpdateGroundJumpState_ColliderVariant();
+            UpdateWallJumpState_ColliderVariant();
         }
         HandleVerticalMovement();
         HandleHorizontalMovement();
     }
 
-    void UpdateJumpStates_ColliderVariant()
+    void UpdateGroundJumpState_ColliderVariant()
     {
         if (!Mathf.Approximately(body.linearVelocityY, 0f))
         {
@@ -92,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void UpdateJumpStates_RaycastVariant()
+    void UpdateGroundJumpState_RaycastVariant()
     {
         if (!Mathf.Approximately(body.linearVelocityY, 0f))
         {
@@ -121,6 +123,40 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void UpdateWallJumpState_ColliderVariant()
+    {
+        float dir = moveAction.ReadValue<Vector2>().x;
+        if (!Mathf.Approximately(dir, 0f))
+        {
+            isNearWall = false;
+            return;
+        }
+        dir = Mathf.Sign(dir);
+
+        Vector2 hitboxPosition = transform.position;
+        hitboxPosition += hitbox.offset;
+        Vector2 hitboxSize = hitbox.size;
+
+        // 0.01f needed to avoid border collission with player hitbox
+        hitboxPosition.x += dir * hitboxSize.x * (0.5f + checkSize / 2) + 0.01f;
+        hitboxSize.x = hitboxSize.x * checkSize;
+        isNearWall = Physics2D.OverlapBox(hitboxPosition, hitboxSize, 0f) != null;
+
+        if (drawDebugRays)
+        {
+            hitboxPosition.x -= dir * checkSize / 2;
+            hitboxPosition.y -= hitboxSize.y / 2;
+            Debug.DrawRay(hitboxPosition, Vector2.right * dir, Color.red);
+            hitboxPosition.y += hitboxSize.y;
+            Debug.DrawRay(hitboxPosition, Vector2.right * dir, Color.red);
+        }
+    }
+
+    void UpdateWallJumpState_RaycastVariant()
+    {
+        // todo
+    }
+
     void HandleVerticalMovement()
     {
         if (isGrounded)
@@ -129,11 +165,16 @@ public class PlayerMovement : MonoBehaviour
             coyoteTime = coyoteLength;
         }
 
-        // if jumped (and it is allowed)
-        if ((isGrounded || coyoteTime > 0.0f) && jumpWasPressed > 0.0f)
+        // if jumped
+        if (jumpWasPressed > 0.0f)
         {
-            body.linearVelocityY = jumpAction.ReadValue<float>() > 0.0f ? jumpForce : jumpForce * 0.5f;
-            coyoteTime = 0.0f;
+            // here seperation between normal and wall jump can be added
+            // e.g. add horizontal velocity to player away from the wall
+            if (isGrounded || isNearWall || coyoteTime > 0.0f)
+            {
+                body.linearVelocityY = jumpAction.ReadValue<float>() > 0.0f ? jumpForce : jumpForce * 0.5f;
+                coyoteTime = 0.0f;
+            }
         }
 
         // if in the air
