@@ -16,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     bool isGrounded;
     float jumpWasPressed = 0.0f;
     [SerializeField] float jumpBuffer = 0.1f;
+    float coyoteTime = 0.0f;
+    [SerializeField] float coyoteLength = 0.2f;
     bool jumpJustReleased;
     [SerializeField] float jumpForce = 15f;
     [SerializeField] float gravityForce = 25f;
@@ -124,13 +126,21 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             body.linearVelocityY = 0f;
-            if (jumpWasPressed > 0.0f)
-            {
-                body.linearVelocityY = jumpAction.ReadValue<float>() > 0.0f ? jumpForce : jumpForce * 0.5f;
-            }
+            coyoteTime = coyoteLength;
         }
-        else
+
+        // if jumped (and it is allowed)
+        if ((isGrounded || coyoteTime > 0.0f) && jumpWasPressed > 0.0f)
         {
+            body.linearVelocityY = jumpAction.ReadValue<float>() > 0.0f ? jumpForce : jumpForce * 0.5f;
+            coyoteTime = 0.0f;
+        }
+
+        // if in the air
+        if (!isGrounded)
+        {
+            coyoteTime = Mathf.Clamp(coyoteTime - Time.fixedDeltaTime, 0.0f, coyoteLength);
+
             if (body.linearVelocityY > 0f && jumpJustReleased)
             {
                 body.linearVelocityY *= 0.5f;
