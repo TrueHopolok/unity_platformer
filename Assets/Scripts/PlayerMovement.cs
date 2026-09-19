@@ -155,8 +155,33 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateWallJumpState_RaycastVariant()
     {
-        isNearWall = false;
-        // todo
+        float dir = moveAction.ReadValue<Vector2>().x;
+        if (Mathf.Approximately(dir, 0f))
+        {
+            isNearWall = false;
+            return;
+        }
+        dir = Mathf.Sign(dir);
+
+        Vector2 hitboxPosition = transform.position;
+        hitboxPosition += hitbox.offset;
+        Vector2 hitboxSize = hitbox.size;
+
+        // 0.01f needed to avoid border collission with player hitbox
+        hitboxPosition.x += dir * hitboxSize.x * 0.5f + dir * 0.01f;
+        hitboxPosition.y -= hitboxSize.y / 2;
+
+        float delta = hitboxSize.y / (raycastAmount - 1);
+        for (int i = 0; i < raycastAmount; i++)
+        {
+            isNearWall = Physics2D.Raycast(hitboxPosition, Vector2.right * dir, checkSize);
+            if (drawDebugRays)
+            {
+                Debug.DrawRay(hitboxPosition, Vector2.right * dir, Color.red);
+            }
+            if (isNearWall) break;
+            hitboxPosition.y += delta;
+        }
     }
 
     void HandleVerticalMovement()
