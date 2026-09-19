@@ -127,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
     void UpdateWallJumpState_ColliderVariant()
     {
         float dir = moveAction.ReadValue<Vector2>().x;
-        if (!Mathf.Approximately(dir, 0f))
+        if (Mathf.Approximately(dir, 0f))
         {
             isNearWall = false;
             return;
@@ -139,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 hitboxSize = hitbox.size;
 
         // 0.01f needed to avoid border collission with player hitbox
-        hitboxPosition.x += dir * hitboxSize.x * (0.5f + checkSize / 2) + 0.01f;
+        hitboxPosition.x += dir * hitboxSize.x * (0.5f + checkSize / 2) + dir * 0.01f;
         hitboxSize.x = hitboxSize.x * checkSize;
         isNearWall = Physics2D.OverlapBox(hitboxPosition, hitboxSize, 0f) != null;
 
@@ -155,6 +155,7 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateWallJumpState_RaycastVariant()
     {
+        isNearWall = false;
         // todo
     }
 
